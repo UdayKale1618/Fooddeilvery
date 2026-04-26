@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foodiewe Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+    linear-gradient(rgba(225,124,112,0.7), rgba(0,0,0,0.6)),
+    url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200")
+    center/cover no-repeat;
+}
+
+.logo img{
+    width:200px;
+    padding:15px;
+}
+
+.login-container{
+    background:rgba(65,64,64,0.4);
+    padding:40px 30px;
+    width:380px;
+    backdrop-filter:blur(4px);
+    border-radius:15px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+    text-align:center;
+}
+
+.login-container h2{
+    margin-bottom:20px;
+    color:#fff;
+}
+
+.login-container input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:14px;
+}
+
+.login-container input:focus{
+    border:1px solid #AA2B1D;
+    outline:none;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:25px;
+    background:#fcb53bf0;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#e56969;
+    color:#fff;
+}
+
+.error{
+    color:#ff4d4d;
+    font-size:14px;
+    margin-top:5px;
+}
+
+.captcha-wrapper{
+    margin-top:15px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+canvas{
+    background:linear-gradient(135deg,#fff6e6,#e8e6e4);
+    border:2px solid #ccccccf0;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(181, 179, 179, 0.2);
+    margin-bottom:8px;
+}
+
+.refresh-btn{
+    background:white;
+    color:rgb(10, 9, 9);
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.3s;
+    margin-bottom:8px;
+}
+
+.refresh-btn:hover{
+    background:#e56969;
+}
+
+.welcome-page{
+    display:none;
+    background:white;
+    padding:40px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-container" id="loginBox">
+
+    <div class="logo">
+        <img src="food.png" alt="Foodiewe Logo">
+    </div>
+
+    <h2>User Login</h2>
+
+    <input type="text" id="name" placeholder="Enter Your Name">
+    <input type="text" id="mobile" placeholder="Enter Mobile Number">
+    <input type="email" id="email" placeholder="Enter Email ID">
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <div class="captcha-wrapper">
+        <canvas id="captchaCanvas" width="250" height="80"></canvas>
+        <div class="refresh-btn" onclick="generateCaptcha()">🔄 Refresh Captcha</div>
+        <input type="text" id="captchaInput" placeholder="Type the word above">
+    </div>
+
+    <p class="error" id="errorMsg"></p>
+
+    <button onclick="validateForm()">Login</button>
+</div>
+
+<div class="welcome-page" id="welcomeBox">
+    <h1>Congratulations!</h1>
+    <h2>Welcome to Foodiewe</h2>
+    <p id="welcomeText"></p>
+</div>
+
+<script>
+
+let captchaText = "";
+
+function generateCaptcha(){
+    const canvas = document.getElementById("captchaCanvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    captchaText = "";
+
+    for(let i=0;i<5;i++){
+        captchaText += chars.charAt(Math.floor(Math.random()*chars.length));
+    }
+
+    for(let i=0;i<6;i++){
+        ctx.strokeStyle = randomColor();
+        ctx.beginPath();
+        ctx.moveTo(Math.random()*250, Math.random()*80);
+        ctx.lineTo(Math.random()*250, Math.random()*80);
+        ctx.stroke();
+    }
+
+    for(let i=0;i<captchaText.length;i++){
+        ctx.save();
+        ctx.font = "bold 34px Arial";
+        ctx.fillStyle = "#AA2B1D";
+
+        let x = 25 + i*40;
+        let y = 55;
+        let angle = (Math.random()-0.5)*0.6;
+
+        ctx.translate(x,y);
+        ctx.rotate(angle);
+        ctx.fillText(captchaText[i],0,0);
+        ctx.restore();
+    }
+}
+
+function randomColor(){
+    return "rgb(" +
+        Math.floor(Math.random()*200) + "," +
+        Math.floor(Math.random()*200) + "," +
+        Math.floor(Math.random()*200) + ")";
+}
+
+function validateForm(){
+
+let name = document.getElementById("name").value.trim();
+let mobile = document.getElementById("mobile").value.trim();
+let email = document.getElementById("email").value.trim();
+let password = document.getElementById("password").value.trim();
+let captchaInput = document.getElementById("captchaInput").value.trim().toUpperCase();
+
+let namePattern = /^[A-Za-z ]+$/;
+let mobilePattern = /^[0-9]{10}$/;
+let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+let passwordPattern = /^(?=.*[0-9]).{6,}$/;
+
+/* Empty fields */
+
+if(name===""||mobile===""||email===""||password===""||captchaInput===""){
+alert("All fields are required!");
+return;
+}
+
+/* Name validation */
+
+if(!namePattern.test(name)){
+alert("Name should contain only alphabets.");
+return;
+}
+
+/* Mobile validation */
+
+if(!mobilePattern.test(mobile)){
+alert("Mobile number must be exactly 10 digits.");
+return;
+}
+
+/* Email validation */
+
+if(!emailPattern.test(email)){
+alert("Please enter a valid Email ID.");
+return;
+}
+
+/* Password validation */
+
+if(!passwordPattern.test(password)){
+alert("Password must be at least 6 characters and contain 1 number.");
+return;
+}
+
+/* Captcha validation */
+
+if(captchaInput !== captchaText){
+alert("Incorrect Captcha!");
+generateCaptcha();
+return;
+}
+
+/* Success */
+
+localStorage.setItem("username", name);
+
+alert("Login Successful! Welcome " + name + " 🍕");
+
+window.location.href = "ind.html";
+
+}
+
+generateCaptcha();
+
+</script>
+
+</body>
+</html>
