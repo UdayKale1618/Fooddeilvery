@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foodiewe - Home</title>
 <link rel="stylesheet" href="index.css">
+<script>
+// check if user logged in
+let user = localStorage.getItem("username");
+
+if(!user){
+    alert("Please login first!");
+    window.location.href="login.html";
+}
+</script>
 </head>
 
 <body>
@@ -124,18 +133,6 @@ Order Now
 <p>© 2026 Foodiewe | Designed with ❤️</p>
 
 </footer>
-
-<script>
-
-// check if user logged in
-let user = localStorage.getItem("username");
-
-if(!user){
-alert("Please login first!");
-window.location.href="login.html";
-}
-
-</script>
 
 </body>
 </html>
